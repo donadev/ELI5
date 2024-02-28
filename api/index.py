@@ -3,8 +3,6 @@ import re
 from flask import Response, stream_with_context, Flask, render_template, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
-import time
-from googlesearch import search
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
 
