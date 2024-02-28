@@ -28,10 +28,29 @@ export const useStore = create<QueryStore>((set) => ({
         },
         body: JSON.stringify(query),
       });
-      const searchResult = await response.json();
-      set((state) => ({ results: [searchResult] }));
+      await stream(response, (value) => {
+        set((state) => ({ results: [{message: value}] }));
+      })
     } catch (error) {
       console.error("Error creating todo:", error);
     }
   }
 }));
+async function stream(response : Response, handler: (value: string) => void) {
+  const reader = response.body!.getReader();
+  let chunks = "";
+  
+  let done, value;
+  while (!done) {
+    ({ value, done } = await reader.read());
+    if (done) {
+      return;
+    }
+    if (value) {
+      let decoded = new TextDecoder().decode(value)
+      console.log(decoded)
+      chunks = chunks.concat(decoded);
+      handler(chunks)
+    }
+  }
+}
