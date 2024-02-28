@@ -9,3 +9,4 @@ six==1.16.0
 Werkzeug==2.3.4
 openai==1.11.1
 python-dotenv
+beautifulsoup4
