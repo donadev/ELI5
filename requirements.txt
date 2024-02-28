@@ -11,3 +11,4 @@ openai==1.11.1
 python-dotenv
 beautifulsoup4
 requests
+urllib3==1.26.6
