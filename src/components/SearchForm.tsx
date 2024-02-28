@@ -1,20 +1,19 @@
 import { useStore } from "@/store";
 import { useState } from "react";
 
-export default function TodoForm() {
-  const addTodo = useStore((state) => state.addTodo);
+export default function SearchForm() {
+  const searchQuery = useStore((state) => state.search);
   const [loading, setLoading] = useState(false);
-  const [newTodo, setNewTodo] = useState("");
+  const [query, setQuery] = useState("");
 
-  const handleCreateTodo = async () => {
-    if (newTodo.length === 0) return alert("Todo input must not be empty");
+  const handleSearchQuery = async () => {
+    if (query.length === 0) return alert("Query input must not be empty");
     try {
       setLoading(true);
-      const todo = { title: newTodo };
-      await addTodo(todo);
-      setNewTodo("");
+      await searchQuery({title: query});
+      setQuery("");
     } catch (error) {
-      console.error("Error creating todo item:", error);
+      console.error("Error searching query:", error);
     } finally {
       setLoading(false);
     }
@@ -24,8 +23,9 @@ export default function TodoForm() {
     <div className="flex items-center space-x-2 mb-4">
       <input
         type="text"
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
+        value={query}
+        placeholder="Relativity Theory"
+        onChange={(e) => setQuery(e.target.value)}
         className="border rounded px-2 py-1 flex-1"
       />
       <button
@@ -33,9 +33,9 @@ export default function TodoForm() {
         className={`px-2 py-1 text-white rounded ${
           loading ? "bg-gray-400" : "bg-green-500"
         }`}
-        onClick={handleCreateTodo}
+        onClick={handleSearchQuery}
       >
-        Add
+        Search
       </button>
     </div>
   );

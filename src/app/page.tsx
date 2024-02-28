@@ -1,26 +1,23 @@
 "use client";
 
-import TodoForm from "@/components/TodoForm";
-import TodoItem from "@/components/TodoItem";
+import SearchForm from "@/components/SearchForm";
+import SearchResult from "@/components/SearchResult";
 import { useStore } from "@/store";
 import { useEffect } from "react";
 
 const Home: React.FC = () => {
-  const todos = useStore((state) => state.todos);
-  const fetchTodos = useStore((state) => state.fetchTodos);
-
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  const results = useStore((state) => state.results);
 
   return (
     <div className="container mx-auto max-w-md p-4">
-      <TodoForm />
-      <h1 className="text-2xl font-bold mb-4">Todo List</h1>
-      {todos.length === 0 ? (
+      <h1 className="text-2xl font-bold mb-4">Explain it Like I'm 5</h1>
+      <h2 className="text-1xl font-regular mb-3">Choose an argument and learn it with very simple principles</h2>
+
+      <SearchForm />
+      {results.length === 0 ? (
         <p className="text-center">No Todos Found</p>
       ) : (
-        todos.map((todo) => <TodoItem key={todo.id} todo={todo} />)
+        results.map((result) => <SearchResult key={result.id} result={result} />)
       )}
     </div>
   );
