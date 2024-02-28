@@ -3,8 +3,7 @@ import { useState } from "react";
 
 interface SearchResultProps {
   result: {
-    id: number;
-    title: string;
+    message: string;
   };
 }
 
@@ -14,7 +13,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ result }) => {
 
   return (
     <div className="flex items-center space-x-2 mb-2">
-        {result.title}
+        <p dangerouslySetInnerHTML={{ __html: result.message }}></p>
     </div>
   );
 };

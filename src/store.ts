@@ -1,12 +1,11 @@
 import { create } from "zustand";
 
 type SearchResult = {
-  id: number;
-  title: string;
+  message: string;
 };
 
 type SearchQuery = {
-  title: string;
+  query: string;
 };
 
 type QueryStore = {
@@ -30,7 +29,7 @@ export const useStore = create<QueryStore>((set) => ({
         body: JSON.stringify(query),
       });
       const searchResult = await response.json();
-      set((state) => ({ results: [...state.results, searchResult] }));
+      set((state) => ({ results: [searchResult] }));
     } catch (error) {
       console.error("Error creating todo:", error);
     }

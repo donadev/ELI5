@@ -10,7 +10,7 @@ export default function SearchForm() {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
       setLoading(true);
-      await searchQuery({title: query});
+      await searchQuery({query: query});
       setQuery("");
     } catch (error) {
       console.error("Error searching query:", error);
