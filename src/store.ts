@@ -13,8 +13,8 @@ type QueryStore = {
   search: (query: SearchQuery) => void;
 };
 
-const URL = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api`
+const URL = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}/api`
   : "http://localhost:3000/api";
 
 export const useStore = create<QueryStore>((set) => ({
