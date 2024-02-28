@@ -8,7 +8,7 @@
     "next-dev": "next dev",
     "next-prod": "next build",
     "dev": "concurrently \"npm run next-dev\" \"npm run flask-dev\"",
-    "build": "concurrently \"npm run next-prod\" \"npm run flask-prod\"",
+    "build": "npm run flask-prod && npm run next-prod",
     "start": "next start",
     "lint": "next lint"
   },
