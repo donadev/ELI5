@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 
       <SearchForm />
       {results.length === 0 ? (
-        <p className="text-center">No Todos Found</p>
+        <p className="text-center">Search</p>
       ) : (
         results.map((result) => <SearchResult key={result.message} result={result} />)
       )}
