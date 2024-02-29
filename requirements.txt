@@ -12,3 +12,4 @@ python-dotenv
 beautifulsoup4
 requests
 urllib3==1.26.6
+groq

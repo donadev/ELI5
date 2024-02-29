@@ -2,13 +2,13 @@ import json
 import re
 from flask import Response, stream_with_context, Flask, render_template, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
 
-client = OpenAI(organization="org-CfSBGlGQ3mG4LSEYPfp1Yy4o")
+from api.ai import ask, askArgument
+
 app = Flask(__name__)
 CORS(app)
 
@@ -40,21 +40,7 @@ def boldPrompt(p):
     Given this paragraph: "{p}"
     Return the same with bold tags on some key words.
     """
-def ask(prompt):
-    return client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]).choices[0].message.content
 
-def askArgument(prompt):
-    return client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        stream=True,
-        messages=[
-            {"role": "system", "content": f"You are a an expert that aims to explain things to normal people in the most simple way possibile (like he's 5 years old). You divide output in html paragraphs"},
-            {"role": "user", "content": prompt}
-        ])
 
 def get_image(prompt):
     try:
