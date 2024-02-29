@@ -11,6 +11,7 @@ type SearchQuery = {
 type QueryStore = {
   results: SearchResult[];
   search: (query: SearchQuery) => void;
+  clear: () => void;
 };
 
 const URL = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -19,6 +20,9 @@ const URL = process.env.NEXT_PUBLIC_VERCEL_URL
 
 export const useStore = create<QueryStore>((set) => ({
   results: [],
+  clear: () => {
+    set((state) => ({ results: [] }));
+  },
   search: async (query) => {
     try {
       const response = await fetch(`${URL}/search`, {
@@ -48,9 +52,7 @@ async function stream(response : Response, handler: (value: string) => void) {
     }
     if (value) {
       let decoded = new TextDecoder().decode(value)
-      console.log(decoded)
-      chunks = chunks.concat(decoded);
-      handler(chunks)
+      handler(decoded)
     }
   }
 }
