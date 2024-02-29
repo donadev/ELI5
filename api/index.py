@@ -68,8 +68,8 @@ def get_image(prompt):
 
 def transform(query, paragraph):
     with ThreadPoolExecutor() as executor:
-        [paragraph, image_keys] = executor.map(ask, [boldPrompt(paragraph, query), imagePrompt(paragraph, query)]) 
-    image = get_image(image_keys)
+        [paragraph] = executor.map(ask, [boldPrompt(paragraph, query)])#, imagePrompt(paragraph, query)]) 
+    image = get_image(query)
     if image:
         paragraph = f"{paragraph}<br/><img src=\"{image}\"/>"
 
