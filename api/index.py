@@ -27,23 +27,26 @@ def enhance_result(output, pattern):
 
 def explanationPrompt(argument):
     return f""""
-    Explain the following concept: {argument} in a concise and simple way, like I'm 5 years old. 
-    Output as list of paragraphs, 200 words max overall.
+    Explain the following concept: {argument} in a concise (700 chars max) and simple way, like I'm 5 years old. 
     """
-def imagePrompt(p):
+def imagePrompt(p, arg):
     return f""""
-    Given this paragraph: "{p}"
-    If you find that its useful, generate a query to search on Bing Images for an image that can clarify content.
+    Given this paragraph: "{p}", relative to the argument "{arg}"
+    You can decide if you want to augment the content with an Image.
+    If you decide to do it, output a short query to search the most relevant image on Bing.
+    If you decide to don't do it, output "NO"
     """
-def boldPrompt(p):
+def boldPrompt(p, arg):
     return f""""
-    Given this paragraph: "{p}"
+    Given this paragraph: "{p}", relative to the argument "{arg}"
     Return the same with <b> tags on some key words.
     """
 
 def get_image(prompt):
     try:
-        print("Prompt", prompt, flush=True)
+        if prompt == "NO":
+            return None
+        print("ImageQuery", prompt, flush=True)
         # Perform Google search
         url = rf'https://www.bing.com/images/search?q={prompt}&form=QBILPG'
 
@@ -63,10 +66,9 @@ def get_image(prompt):
         print("An error occurred:", str(e))
         return None
 
-def transform(paragraph):
-
+def transform(query, paragraph):
     with ThreadPoolExecutor() as executor:
-        [paragraph, image_keys] = executor.map(ask, [boldPrompt(paragraph), imagePrompt(paragraph)]) 
+        [paragraph, image_keys] = executor.map(ask, [boldPrompt(paragraph, query), imagePrompt(paragraph, query)]) 
     image = get_image(image_keys)
     if image:
         paragraph = f"{paragraph}<br/><img src=\"{image}\"/>"
@@ -87,7 +89,7 @@ def askPrompt(prompt):
             #yield full_reply_content
     soup = BeautifulSoup(full_reply_content, 'html.parser')
     with ThreadPoolExecutor() as executor:
-        transformed_paragraphs = executor.map(transform, [str(p) for p in soup.find_all('p')])  
+        transformed_paragraphs = executor.map(lambda a: transform(*a), [(prompt, str(p)) for p in soup.find_all('p')])  
     paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
     yield paragraphs_html
 

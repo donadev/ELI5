@@ -19,6 +19,11 @@ export default function SearchForm() {
     }
   }, []);
 
+  const handleKeyDown = (e : any) => {
+    if (e.key === 'Enter') {
+      handleSearchQuery()
+    }
+  }
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
@@ -40,6 +45,7 @@ export default function SearchForm() {
         placeholder="Relativity Theory"
         onChange={(e) => setQuery(e.target.value)}
         className="border rounded px-2 py-1 flex-1"
+        onKeyDown={handleKeyDown}
       />
       {loading ? (<Dots/>) :
         (<button
