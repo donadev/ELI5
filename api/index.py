@@ -4,7 +4,7 @@ from flask import Response, stream_with_context, Flask, render_template, request
 from flask_cors import CORS
 from openai import OpenAI
 from bs4 import BeautifulSoup
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 
@@ -104,8 +104,8 @@ def searchArg():
         
         soup = BeautifulSoup(full_reply_content, 'html.parser')
         # Trova tutti i tag <p> nella pagina e ottieni solo il loro HTML
-        with Pool() as pool:
-            transformed_paragraphs = pool.map(transform, [str(p) for p in soup.find_all('p')])
+        with ThreadPoolExecutor() as executor:
+            transformed_paragraphs = executor.map(transform, [str(p) for p in soup.find_all('p')])
             
         paragraphs_html = "".join(transformed_paragraphs)
         yield paragraphs_html
