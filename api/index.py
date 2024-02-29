@@ -33,29 +33,31 @@ def explanationPrompt(argument):
 def imagePrompt(p):
     return f""""
     Given this paragraph: "{p}"
-    Generate a query to search on Google Images for an image that can clarify content.
+    If you find that its useful, generate a query to search on Bing Images for an image that can clarify content.
     """
 def boldPrompt(p):
     return f""""
     Given this paragraph: "{p}"
-    Return the same with bold tags on some key words.
+    Return the same with <b> tags on some key words.
     """
-
 
 def get_image(prompt):
     try:
+        print("Prompt", prompt, flush=True)
         # Perform Google search
-        url = rf'https://www.google.no/search?q={prompt}&client=opera&hs=cTQ&source=lnms&tbm=isch&sa=X&safe=active&ved=0ahUKEwig3LOx4PzKAhWGFywKHZyZAAgQ_AUIBygB&biw=1920&bih=982'
+        url = rf'https://www.bing.com/images/search?q={prompt}&form=QBILPG'
 
         page = requests.get(url).text
 
         soup = BeautifulSoup(page, 'html.parser')
 
-        for raw_img in soup.find_all('img'):
-            link = raw_img.get('src')
-    
-            if link and link.startswith("https://"):
-                return link
+        for a in soup.find_all('a', {"class": "iusc"}):
+            m = a.get('m')
+            if m:
+                body = json.loads(m)
+                link = body["murl"]
+                if link and link.startswith("https://"):
+                    return link
         
     except Exception as e:
         print("An error occurred:", str(e))
@@ -86,7 +88,7 @@ def askPrompt(prompt):
     soup = BeautifulSoup(full_reply_content, 'html.parser')
     with ThreadPoolExecutor() as executor:
         transformed_paragraphs = executor.map(transform, [str(p) for p in soup.find_all('p')])  
-    paragraphs_html = "".join(transformed_paragraphs)
+    paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
     yield paragraphs_html
 
 @app.route("/api/search", methods=["POST"])
