@@ -1,18 +1,27 @@
 import { useStore } from "@/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dots } from "react-activity";
 import "react-activity/dist/library.css";
+import { useSearchParams } from 'next/navigation'
 
 export default function SearchForm() {
+  const searchParams = useSearchParams()
+  const queryParam = searchParams.get('q')
+
   const searchQuery = useStore((state) => state.search);
   const clear = useStore((state) => state.clear);
   const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(queryParam ?? "");
+
+  useEffect(() => {
+    if(queryParam != null) {
+      handleSearchQuery();
+    }
+  }, []);
 
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
-      clear();
       setLoading(true);
       await searchQuery({query: query});
       setQuery("");

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 type SearchResult = {
+  title: string;
   message: string;
 };
 
@@ -33,7 +34,8 @@ export const useStore = create<QueryStore>((set) => ({
         body: JSON.stringify(query),
       });
       await stream(response, (value) => {
-        set((state) => ({ results: [{message: value}] }));
+        const result = {title: query.query, message: value}
+        set((state) => ({ results: [result, ...state.results] }));
       })
     } catch (error) {
       console.error("Error creating todo:", error);

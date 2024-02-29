@@ -62,8 +62,9 @@ def get_image(prompt):
         return None
 
 def transform(paragraph):
-    paragraph = ask(boldPrompt(paragraph))
-    image_keys = ask(imagePrompt(paragraph))
+
+    with ThreadPoolExecutor() as executor:
+        [paragraph, image_keys] = executor.map(ask, [boldPrompt(paragraph), imagePrompt(paragraph)]) 
     image = get_image(image_keys)
     if image:
         paragraph = f"{paragraph}<br/><img src=\"{image}\"/>"
@@ -71,32 +72,30 @@ def transform(paragraph):
     paragraph = f"{paragraph}<br/>"
     return paragraph
 
+def askPrompt(prompt):
+    full_reply_content = ""
+    for chunk in askArgument(prompt):
+        chunk_message = chunk.choices[0].delta.content  # extract the message
+            #collected_messages.append(chunk_message)
+            #collected_messages = [m for m in collected_messages if m is not None]
+            #full_reply_content = ''.join([m for m in collected_messages])
+        if chunk_message:
+                #print(chunk_message, flush=True, end="")
+            full_reply_content = f"{full_reply_content}{chunk_message}"
+            #yield full_reply_content
+    soup = BeautifulSoup(full_reply_content, 'html.parser')
+    with ThreadPoolExecutor() as executor:
+        transformed_paragraphs = executor.map(transform, [str(p) for p in soup.find_all('p')])  
+    paragraphs_html = "".join(transformed_paragraphs)
+    yield paragraphs_html
+
 @app.route("/api/search", methods=["POST"])
 def searchArg():
     argument = request.json["query"]
 
     prompt = explanationPrompt(argument)
-
-    def askPrompt():
-        full_reply_content = ""
-        for chunk in askArgument(prompt):
-            chunk_message = chunk.choices[0].delta.content  # extract the message
-            #collected_messages.append(chunk_message)
-            #collected_messages = [m for m in collected_messages if m is not None]
-            #full_reply_content = ''.join([m for m in collected_messages])
-            if chunk_message:
-                #print(chunk_message, flush=True, end="")
-                full_reply_content = f"{full_reply_content}{chunk_message}"
-        
-        soup = BeautifulSoup(full_reply_content, 'html.parser')
-        # Trova tutti i tag <p> nella pagina e ottieni solo il loro HTML
-        with ThreadPoolExecutor() as executor:
-            transformed_paragraphs = executor.map(transform, [str(p) for p in soup.find_all('p')])
-            
-        paragraphs_html = "".join(transformed_paragraphs)
-        yield paragraphs_html
     
-    return Response(askPrompt(), mimetype='text/event-stream')
+    return app.response_class(askPrompt(prompt), mimetype='text/event-stream')
 
 
 @app.route("/api/healthchecker", methods=["GET"])
