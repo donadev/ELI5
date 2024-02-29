@@ -1,14 +1,18 @@
 import { useStore } from "@/store";
 import { useState } from "react";
+import { Dots } from "react-activity";
+import "react-activity/dist/library.css";
 
 export default function SearchForm() {
   const searchQuery = useStore((state) => state.search);
+  const clear = useStore((state) => state.clear);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
 
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
+      clear();
       setLoading(true);
       await searchQuery({query: query});
       setQuery("");
@@ -28,15 +32,18 @@ export default function SearchForm() {
         onChange={(e) => setQuery(e.target.value)}
         className="border rounded px-2 py-1 flex-1"
       />
-      <button
-        disabled={loading}
-        className={`px-2 py-1 text-white rounded ${
-          loading ? "bg-gray-400" : "bg-green-500"
-        }`}
-        onClick={handleSearchQuery}
-      >
-        Search
-      </button>
+      {loading ? (<Dots/>) :
+        (<button
+          disabled={loading}
+          className={`px-2 py-1 text-white rounded ${
+            loading ? "bg-gray-400" : "bg-green-500"
+          }`}
+          onClick={handleSearchQuery}
+        >
+          Search
+        </button>)
+      }
+      
     </div>
   );
 }
