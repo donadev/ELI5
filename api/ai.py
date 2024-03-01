@@ -5,8 +5,8 @@ from groq import Groq
 
 #OPENAI
 client = OpenAI(organization="org-CfSBGlGQ3mG4LSEYPfp1Yy4o")
-#model = "gpt-3.5-turbo-0125" 
-model = "gpt-4-0125-preview"
+model = "gpt-3.5-turbo-0125" 
+#model = "gpt-4-0125-preview"
 #GROQ
 #client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 #model = "mixtral-8x7b-32768"
