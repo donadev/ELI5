@@ -27,7 +27,6 @@ const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
 : "http://localhost:3000";
 
-Pusher.logToConsole = true;
 
     var pusher = new Pusher('63825740c4c965adde6c', {
       cluster: 'mt1'

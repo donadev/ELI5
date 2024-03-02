@@ -25,6 +25,6 @@ def askArgument(prompt):
         model=model,
         stream=True,
         messages=[
-            {"role": "system", "content": f"You are a an expert that aims to explain things to normal people in the most simple way possibile (like he's 5 years old). You divide output in html paragraphs. You put in <b> the key words."},
+            {"role": "system", "content": f"You are a an expert that aims to explain things to normal people in the most simple way possibile (like he's 5 years old). You divide output in html paragraphs."},
             {"role": "user", "content": prompt}
         ])

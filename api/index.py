@@ -30,11 +30,12 @@ def imagePrompt(p, arg):
 def boldPrompt(p, arg):
     return f""""
     Given this paragraph: "{p}", relative to the argument "{arg}"
-    Return the same with <b> tags on some key words. Do not alter the content.
+    Return a list of words, comma separated, in this paragraphs that you think can go bold.
     """
 
 def get_image(prompt):
     try:
+        print("Image prompt", prompt)
         if prompt == "NO":
             return None
         # Perform Google search
@@ -56,11 +57,26 @@ def get_image(prompt):
         print("An error occurred:", str(e))
         return None
 
+def bold_occurrences(text, word):
+    occurrences = text.split(f" {word} ")
+    if len(occurrences) > 1:
+        new_text = f' <b>{word}</b> '.join(occurrences)
+        return new_text
+    else:
+        return text
+    
+def boldify(paragraph, bold_words):
+    words = bold_words.split(",")
+    for word in words:
+        paragraph = bold_occurrences(paragraph, word.strip())
+    return paragraph
+
 def transform(query, paragraph):
     print("transform", paragraph, flush=True)
     with ThreadPoolExecutor() as executor:
-        [paragraph] = executor.map(ask, [boldPrompt(paragraph, query)])#, imagePrompt(paragraph, query)]) 
-    image = get_image(query)
+        [bold_words, image_prompt] = executor.map(ask, [boldPrompt(paragraph, query), imagePrompt(paragraph, query)]) 
+    paragraph = boldify(paragraph, bold_words)
+    image = get_image(image_prompt)
     if image:
         paragraph = f"{paragraph}<br/><img src=\"{image}\"/>"
 
