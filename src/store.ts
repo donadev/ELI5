@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 type SearchResult = {
   query: string;
+  id: string;
   message: string;
   status: string;
 };
@@ -44,15 +45,15 @@ export const useStore = create<QueryStore>((set) => ({
     set((state) => ({ results: [] }));
   },
   search: async (body) => {
-    const clientId = uuidv4()
-    console.log("Asking", body.query, "clientId", clientId, baseUrl)
+    const queryId = uuidv4()
+    console.log("Asking", body.query, "queryId", queryId, baseUrl)
 
     fetch("/api/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({query: body.query, clientId: clientId}),
+      body: JSON.stringify({query: body.query, clientId: queryId}),
     })
     .then(console.log)
     .catch(console.error)
@@ -61,8 +62,18 @@ export const useStore = create<QueryStore>((set) => ({
 
     return new Promise((resolve, reject) => {
 
-      channel.bind(clientId, (event: { data: string; status: string; }) => {
-        set((state) => ({ results: [{query: body.query, message: event.data, status: event.status}] }));
+      channel.bind(queryId, (event: { data: string; status: string; }) => {
+        const payload = {query: body.query, id: queryId, message: event.data, status: event.status}
+        set((state) => {
+          let results = state.results ?? []
+          const index = results.findIndex(v => v.id == queryId);
+          if (index == -1) {
+            results.unshift(payload)
+          } else {
+            results[index] = payload
+          }
+          return { results: [...results] }
+        });
         if(event.status == "ended") resolve();
       });
 
