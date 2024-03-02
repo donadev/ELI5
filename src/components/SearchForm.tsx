@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Dots } from "react-activity";
 import "react-activity/dist/library.css";
 import { useSearchParams } from 'next/navigation'
+import { kv } from "@vercel/kv";
 
 export default function SearchForm() {
   const searchParams = useSearchParams()
@@ -27,6 +28,9 @@ export default function SearchForm() {
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
+
+      const hits = (await kv.get<number>(query)) ?? 0
+      await kv.set<number>(query, hits + 1)
       setLoading(true);
       await searchQuery({query: query});
       setQuery("");

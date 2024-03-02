@@ -18,7 +18,7 @@ const Home: React.FC = () => {
     .then(async ip => {
       const visits = (await kv.get<number>(ip)) ?? 0
       console.log(ip, visits)
-      kv.set<number>(ip, visits + 1)
+      await kv.set<number>(ip, visits + 1)
       return visits
     })
     .then(setVisits)
