@@ -18,19 +18,17 @@ CORS(app)
 
 def explanationPrompt(argument):
     return f""""
-    Explain how the following concept work: "{argument}" like I'm 5 years old. Use 100 words.
+    Explain how the following concept work: "{argument}". Use 100 words max.
     """
 def imagePrompt(p, arg):
     return f""""
     Given this paragraph: "{p}", relative to the argument "{arg}"
-    You can decide if you want to augment the content with an Image.
-    If you decide to do it, output a short query to search the most relevant image on Bing.
-    If you decide to don't do it, output "NO"
+    Generate a long query, optimized for Bing Image search, to find an image that can help with paragraph comprehension.
     """
 def boldPrompt(p, arg):
     return f""""
     Given this paragraph: "{p}", relative to the argument "{arg}"
-    Return a list of words, comma separated, in this paragraphs that you think can go bold.
+    Return a list of words, comma separated, that you think can go bold.
     """
 
 def get_image(prompt):
@@ -97,8 +95,11 @@ def askPrompt(prompt, argument, topic):
             stream(topic, full_reply_content)
             yield full_reply_content
     soup = BeautifulSoup(full_reply_content, 'html.parser')
+    mapped = [(argument, str(p)) for p in soup.find_all('p')]
+    if len(mapped) == 0:
+        mapped = [(argument, full_reply_content)]
     with ThreadPoolExecutor() as executor:
-        transformed_paragraphs = executor.map(lambda a: transform(*a), [(argument, str(p)) for p in soup.find_all('p')])  
+        transformed_paragraphs = executor.map(lambda a: transform(*a), mapped)  
     paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
     stream(topic, paragraphs_html, last=True)
     print("Finished generation", flush=True)

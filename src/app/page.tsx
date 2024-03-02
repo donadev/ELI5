@@ -33,7 +33,7 @@ const Home: React.FC = () => {
       <h2 className="text-1xl font-regular mb-3">Choose an argument and learn it with very simple principles</h2>
 
       <SearchForm />
-      {results.map((result) => <SearchResult key={result.message} result={result} />)}
+      {results.map((result) => <SearchResult key={result.id} result={result} />)}
     </div>
   );
 };
