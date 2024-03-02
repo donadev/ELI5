@@ -4,13 +4,15 @@ from flask import Response, stream_with_context, Flask, render_template, request
 from flask_cors import CORS
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
-
+import time
 import requests
+from flask_socketio import SocketIO, emit
 
 from api.ai import ask, askArgument
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app)
 
 def enhance_result(output, pattern):
     print(output)
@@ -27,7 +29,7 @@ def enhance_result(output, pattern):
 
 def explanationPrompt(argument):
     return f""""
-    Explain the following concept: {argument} in a concise (700 chars max) and simple way, like I'm 5 years old. 
+    Explain how the following concept work: {argument} like I'm 5 years old. Use 100 words.
     """
 def imagePrompt(p, arg):
     return f""""
@@ -39,7 +41,7 @@ def imagePrompt(p, arg):
 def boldPrompt(p, arg):
     return f""""
     Given this paragraph: "{p}", relative to the argument "{arg}"
-    Return the same with <b> tags on some key words.
+    Return the same with <b> tags on some key words. Do not alter the content.
     """
 
 def get_image(prompt):
@@ -76,7 +78,7 @@ def transform(query, paragraph):
     paragraph = f"{paragraph}<br/>"
     return paragraph
 
-def askPrompt(prompt):
+def askPrompt(prompt, topic):
     full_reply_content = ""
     for chunk in askArgument(prompt):
         chunk_message = chunk.choices[0].delta.content  # extract the message
@@ -86,20 +88,28 @@ def askPrompt(prompt):
         if chunk_message:
                 #print(chunk_message, flush=True, end="")
             full_reply_content = f"{full_reply_content}{chunk_message}"
-            #yield full_reply_content
+            socketio.emit(topic, {"data" : full_reply_content, "status": "generating"}, namespace='/updates')
+            yield full_reply_content
     soup = BeautifulSoup(full_reply_content, 'html.parser')
     with ThreadPoolExecutor() as executor:
         transformed_paragraphs = executor.map(lambda a: transform(*a), [(prompt, str(p)) for p in soup.find_all('p')])  
     paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
+    socketio.emit(topic, {"data" : paragraphs_html, "status": "end"}, namespace='/updates')
+
     yield paragraphs_html
 
 @app.route("/api/search", methods=["POST"])
 def searchArg():
     argument = request.json["query"]
+    clientId = request.json["clientId"]
 
     prompt = explanationPrompt(argument)
     
-    return app.response_class(askPrompt(prompt), mimetype='text/event-stream')
+    return stream_with_context(askPrompt(prompt, clientId))
+
+@socketio.on('connect', namespace='/updates')
+def handle_connect():
+    print('Client connected', flush=True)
 
 
 @app.route("/api/healthchecker", methods=["GET"])
@@ -108,4 +118,4 @@ def healthchecker():
 
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)
