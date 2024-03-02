@@ -14,24 +14,34 @@ type SearchQuery = {
 
 type QueryStore = {
   results: SearchResult[];
+  get_ip: () => Promise<string>;
   search: (query: SearchQuery) => void;
   clear: () => void;
+  toggleModal: (open: boolean) => void
+  modalOpen: boolean,
+  openForm: () => void
 };
 
-const URL = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api`
-  : "http://localhost:3000/api";
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+: "http://localhost:3000";
 
 
 export const useStore = create<QueryStore>((set) => ({
   results: [],
+  ip: "",
+  get_ip: async () => {
+    const response = await fetch("/api/ip");
+    const json = await response.json();
+    return json.requester_ip
+  },
   clear: () => {
     set((state) => ({ results: [] }));
   },
   search: async (body) => {
     const clientId = uuidv4()
     console.log("Asking", body.query, "clientId", clientId)
-    const socket = io(`http://localhost:3000/updates`);  // Adjust URL accordingly
+    const socket = io(`${baseUrl}/updates`);  // Adjust URL accordingly
 
     socket.on('connect', () => {
       console.log('WebSocket connected');
@@ -60,5 +70,12 @@ export const useStore = create<QueryStore>((set) => ({
     socket.on("disconnect", () => {
       console.log("disconnected"); // undefined
     });
+  },
+  toggleModal: (open) => {
+    set((state) => ({ modalOpen: open}));
+  },
+  modalOpen: false,
+  openForm: () => {
+    location.href = "https://docs.google.com/forms/d/18NAYuR19t0uqjYnsJUQQ8Vk66rtKKPup3EtWaJfMdRk/edit?ts=65e19a4c"
   }
 }));

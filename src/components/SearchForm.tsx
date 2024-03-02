@@ -51,7 +51,7 @@ export default function SearchForm() {
         (<button
           disabled={loading}
           className={`px-2 py-1 text-white rounded ${
-            loading ? "bg-gray-400" : "bg-green-500"
+            loading ? "bg-gray-400" : "bg-sky-500"
           }`}
           onClick={handleSearchQuery}
         >

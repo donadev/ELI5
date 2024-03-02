@@ -111,6 +111,11 @@ def searchArg():
 def handle_connect():
     print('Client connected', flush=True)
 
+@app.route('/api/ip')
+def get_requester_ip():
+    requester_ip = request.remote_addr
+    return jsonify({"requester_ip": requester_ip})
+
 
 @app.route("/api/healthchecker", methods=["GET"])
 def healthchecker():
