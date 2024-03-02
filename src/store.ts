@@ -64,7 +64,7 @@ export const useStore = create<QueryStore>((set) => ({
 
       channel.bind(clientId, (event: { data: string; status: string; }) => {
         set((state) => ({ results: [{query: body.query, message: event.data, status: event.status}] }));
-        if(event.status == "end") resolve();
+        if(event.status == "ended") resolve();
       });
 
     })
