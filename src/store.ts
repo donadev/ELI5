@@ -26,6 +26,8 @@ const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
 : "http://localhost:3000";
 
+const socket = io(`${baseUrl}/updates`); 
+
 
 export const useStore = create<QueryStore>((set) => ({
   results: [],
@@ -40,24 +42,25 @@ export const useStore = create<QueryStore>((set) => ({
   },
   search: async (body) => {
     const clientId = uuidv4()
-    console.log("Asking", body.query, "clientId", clientId)
-    const socket = io(`${baseUrl}/updates`);  // Adjust URL accordingly
+    console.log("Asking", body.query, "clientId", clientId, baseUrl)
 
-    socket.on('connect', () => {
-      console.log('WebSocket connected');
-      fetch("/api/search", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({query: body.query, clientId: clientId}),
-        })
-        .then(console.log)
-        .catch(console.error)
+    fetch("/api/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({query: body.query, clientId: clientId}),
+    })
+    .then(console.log)
+    .catch(console.error)
+
+    socket.on("disconnect", () => {
+      console.log("disconnected"); // undefined
     });
     return new Promise((resolve, reject) => {
 
       socket.on(clientId, (event) => {
+        console.log(event)
         set((state) => ({ results: [{query: body.query, message: event.data as string, status: event.status as string}] }));
         if(event.status == "end") resolve();
       });
@@ -67,9 +70,6 @@ export const useStore = create<QueryStore>((set) => ({
       });
 
     })
-    socket.on("disconnect", () => {
-      console.log("disconnected"); // undefined
-    });
   },
   toggleModal: (open) => {
     set((state) => ({ modalOpen: open}));

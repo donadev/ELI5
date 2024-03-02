@@ -12,6 +12,7 @@ model = "gpt-3.5-turbo-0125"
 #model = "mixtral-8x7b-32768"
 
 def ask(prompt):
+    print(prompt, flush=True)
     return client.chat.completions.create(
         model=model,
         messages=[
@@ -19,6 +20,7 @@ def ask(prompt):
         ]).choices[0].message.content
 
 def askArgument(prompt):
+    print(prompt, flush=True)
     return client.chat.completions.create(
         model=model,
         stream=True,

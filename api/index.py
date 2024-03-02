@@ -14,22 +14,11 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
 
-def enhance_result(output, pattern):
-    print(output)
-    contexts = re.findall(pattern, output)
-    print(contexts)
-    images = [get_image(ctx) for ctx in contexts]
-    print(images)
-    replaced = [x.group() for x in re.finditer(pattern, output)]
-    print(replaced)
-    for (i, o) in zip(replaced, images):
-        output = output.replace(i, o)
-    return output
 
 
 def explanationPrompt(argument):
     return f""""
-    Explain how the following concept work: {argument} like I'm 5 years old. Use 100 words.
+    Explain how the following concept work: "{argument}" like I'm 5 years old. Use 100 words.
     """
 def imagePrompt(p, arg):
     return f""""
@@ -48,7 +37,6 @@ def get_image(prompt):
     try:
         if prompt == "NO":
             return None
-        print("ImageQuery", prompt, flush=True)
         # Perform Google search
         url = rf'https://www.bing.com/images/search?q={prompt}&form=QBILPG'
 
@@ -69,6 +57,7 @@ def get_image(prompt):
         return None
 
 def transform(query, paragraph):
+    print("transform", paragraph, flush=True)
     with ThreadPoolExecutor() as executor:
         [paragraph] = executor.map(ask, [boldPrompt(paragraph, query)])#, imagePrompt(paragraph, query)]) 
     image = get_image(query)
@@ -78,23 +67,25 @@ def transform(query, paragraph):
     paragraph = f"{paragraph}<br/>"
     return paragraph
 
-def askPrompt(prompt, topic):
+def askPrompt(prompt, argument, topic):
     full_reply_content = ""
     for chunk in askArgument(prompt):
         chunk_message = chunk.choices[0].delta.content  # extract the message
             #collected_messages.append(chunk_message)
             #collected_messages = [m for m in collected_messages if m is not None]
             #full_reply_content = ''.join([m for m in collected_messages])
+    
         if chunk_message:
                 #print(chunk_message, flush=True, end="")
             full_reply_content = f"{full_reply_content}{chunk_message}"
-            socketio.emit(topic, {"data" : full_reply_content, "status": "generating"}, namespace='/updates')
+            socketio.emit(topic, {"data" : full_reply_content}, namespace='/updates')
             yield full_reply_content
     soup = BeautifulSoup(full_reply_content, 'html.parser')
     with ThreadPoolExecutor() as executor:
-        transformed_paragraphs = executor.map(lambda a: transform(*a), [(prompt, str(p)) for p in soup.find_all('p')])  
+        transformed_paragraphs = executor.map(lambda a: transform(*a), [(argument, str(p)) for p in soup.find_all('p')])  
     paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
     socketio.emit(topic, {"data" : paragraphs_html, "status": "end"}, namespace='/updates')
+    print("Finished generation", flush=True)
 
     yield paragraphs_html
 
@@ -105,7 +96,7 @@ def searchArg():
 
     prompt = explanationPrompt(argument)
     
-    return stream_with_context(askPrompt(prompt, clientId))
+    return stream_with_context(askPrompt(prompt, argument, clientId))
 
 @socketio.on('connect', namespace='/updates')
 def handle_connect():
