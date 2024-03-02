@@ -84,6 +84,6 @@ export const useStore = create<QueryStore>((set) => ({
   },
   modalOpen: false,
   openForm: () => {
-    location.href = "https://docs.google.com/forms/d/18NAYuR19t0uqjYnsJUQQ8Vk66rtKKPup3EtWaJfMdRk/edit?ts=65e19a4c"
+    window.open('https://forms.gle/c4AFWkYFkAQ7mZeLA', '_blank');
   }
 }));
