@@ -6,13 +6,13 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 import time
 import requests
-from flask_socketio import SocketIO, emit
 
 from api.ai import ask, askArgument
+from api.pubsub import stream
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
+
 
 
 
@@ -78,13 +78,13 @@ def askPrompt(prompt, argument, topic):
         if chunk_message:
                 #print(chunk_message, flush=True, end="")
             full_reply_content = f"{full_reply_content}{chunk_message}"
-            socketio.emit(topic, {"data" : full_reply_content}, namespace='/updates')
+            stream(topic, full_reply_content)
             yield full_reply_content
     soup = BeautifulSoup(full_reply_content, 'html.parser')
     with ThreadPoolExecutor() as executor:
         transformed_paragraphs = executor.map(lambda a: transform(*a), [(argument, str(p)) for p in soup.find_all('p')])  
     paragraphs_html = "".join(transformed_paragraphs).replace("\"\"\"", "")
-    socketio.emit(topic, {"data" : paragraphs_html, "status": "end"}, namespace='/updates')
+    stream(topic, paragraphs_html, last=True)
     print("Finished generation", flush=True)
 
     yield paragraphs_html
@@ -98,9 +98,6 @@ def searchArg():
     
     return stream_with_context(askPrompt(prompt, argument, clientId))
 
-@socketio.on('connect', namespace='/updates')
-def handle_connect():
-    print('Client connected', flush=True)
 
 @app.route('/api/ip')
 def get_requester_ip():
@@ -114,4 +111,4 @@ def healthchecker():
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    app.run()

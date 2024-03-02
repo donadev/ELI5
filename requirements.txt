@@ -13,4 +13,4 @@ beautifulsoup4
 requests
 urllib3==1.26.6
 groq
-flask_socketio
+pusher
