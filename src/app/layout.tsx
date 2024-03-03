@@ -6,6 +6,7 @@ export const metadata = {
   description: "Choose an argument and learn it with very simple principles",
 };
 
+
 export default function RootLayout({
   children,
 }: {

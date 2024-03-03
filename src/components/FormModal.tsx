@@ -1,5 +1,6 @@
 import { useStore } from "@/store";
 import { useState } from "react";
+import mixpanel from 'mixpanel-browser';
 
 interface FormModalProps {
 }
@@ -10,6 +11,7 @@ const FormModal: React.FC<FormModalProps> = () => {
     const toggleModal = useStore((state) => state.toggleModal);
 
     const applyClick = () => {
+        mixpanel.track("redirectToForm")
         openForm()
         dismissClick()
     }

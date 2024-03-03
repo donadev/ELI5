@@ -23,6 +23,7 @@
     "concurrently": "^8.1.0",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
+    "mixpanel-browser": "^2.49.0",
     "next": "13.4.4",
     "postcss": "8.4.24",
     "pusher-js": "^8.4.0-rc2",
@@ -36,6 +37,7 @@
     "zustand": "^4.3.8"
   },
   "devDependencies": {
+    "@types/mixpanel-browser": "^2.49.0",
     "@types/uuid": "^9.0.8"
   }
 }

@@ -1,6 +1,7 @@
 import { useStore } from "@/store";
 import { useState } from "react";
 import FormModal from "./FormModal";
+import mixpanel from 'mixpanel-browser';
 
 interface FormBubbleProps {
 }
@@ -10,6 +11,7 @@ const FormBubble: React.FC<FormBubbleProps> = () => {
     const modalOpen = useStore((state) => state.modalOpen);
 
     const openModal = () => {
+        mixpanel.track("openModal")
         toggleModal(true)
     }
 

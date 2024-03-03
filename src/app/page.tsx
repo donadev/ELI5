@@ -7,6 +7,7 @@ import { Suspense, useEffect, useState } from "react";
 import { kv } from "@vercel/kv";
 import FormBubble from "@/components/FormBubble";
 import { NextRequest } from 'next/server'
+import mixpanel from 'mixpanel-browser';
 
 const Home: React.FC = () => {
   const results = useStore((state) => state.results);
@@ -14,10 +15,11 @@ const Home: React.FC = () => {
   const [visits, setVisits] = useState(0)
 
   useEffect(() => {
+    mixpanel.init('4aa70294625b8c4f16a456d1bafa5ee9', {ignore_dnt: true, debug: process.env.DEBUG == "1", track_pageview: true, persistence: 'localStorage'});
     getIp()
     .then(async ip => {
       const visits = (await kv.get<number>(ip)) ?? 0
-      console.log(ip, visits)
+      mixpanel.identify(ip)
       await kv.set<number>(ip, visits + 1)
       return visits
     })

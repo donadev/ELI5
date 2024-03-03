@@ -4,6 +4,7 @@ import { Dots } from "react-activity";
 import "react-activity/dist/library.css";
 import { useSearchParams } from 'next/navigation'
 import { kv } from "@vercel/kv";
+import mixpanel from 'mixpanel-browser';
 
 export default function SearchForm() {
   const searchParams = useSearchParams()
@@ -29,7 +30,7 @@ export default function SearchForm() {
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
-
+      mixpanel.track("search", {query: query})
       const hits = (await kv.get<number>(query)) ?? 0
       await kv.set<number>(query, hits + 1)
       const visits = (await kv.get<number>(ip)) ?? 0
