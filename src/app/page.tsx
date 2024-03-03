@@ -30,7 +30,9 @@ const Home: React.FC = () => {
         (visits > 2) ? <FormBubble/> : null
       }
       <h1 className="text-2xl font-bold mb-4">Explain it Like I'm 5</h1>
-      <h2 className="text-1xl font-regular mb-3">Choose an argument and learn it with very simple principles</h2>
+      <h2 className="text-1xl font-regular mb-3">Search for an argument and learn it with very simple principles.</h2>
+      <p className="text-xs text-slate-400 italic mb-3">For an optimal experience, prefer arguments formed by 2-3 words max.</p>
+
 
       <SearchForm />
       {results.map((result) => <SearchResult key={result.id} result={result} />)}
