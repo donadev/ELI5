@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   return (
     <div className="container mx-auto max-w-md p-4">
       {
-        (visits > 5) ? <FormBubble/> : null
+        (visits > 2) ? <FormBubble/> : null
       }
       <h1 className="text-2xl font-bold mb-4">Explain it Like I'm 5</h1>
       <h2 className="text-1xl font-regular mb-3">Choose an argument and learn it with very simple principles</h2>
