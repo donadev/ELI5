@@ -18,7 +18,7 @@ const FormBubble: React.FC<FormBubbleProps> = () => {
   return (
     <div className="rounded-lg  mb-4">
         {modalOpen ? <FormModal/> : null}
-        <p className="text-black">Are you enjoying this product?</p>
+        <p className="text-black">Discover the PRO version, it's free!</p>
         <button onClick={openModal} className="text-sky-400 underline"> Click here</button>
     </div>
   );
