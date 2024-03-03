@@ -10,6 +10,7 @@ export default function SearchForm() {
   const queryParam = searchParams.get('q')
 
   const searchQuery = useStore((state) => state.search);
+  const ip = useStore((state) => state.ip);
   const clear = useStore((state) => state.clear);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(queryParam ?? "");
@@ -31,6 +32,8 @@ export default function SearchForm() {
 
       const hits = (await kv.get<number>(query)) ?? 0
       await kv.set<number>(query, hits + 1)
+      const visits = (await kv.get<number>(ip)) ?? 0
+      await kv.set<number>(ip, visits + 1)
       setLoading(true);
       await searchQuery({query: query});
       setQuery("");

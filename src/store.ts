@@ -16,6 +16,7 @@ type SearchQuery = {
 
 type QueryStore = {
   results: SearchResult[];
+  ip: string;
   get_ip: () => Promise<string>;
   search: (query: SearchQuery) => void;
   clear: () => void;
@@ -39,7 +40,9 @@ export const useStore = create<QueryStore>((set) => ({
   get_ip: async () => {
     const response = await fetch("/api/ip");
     const json = await response.json();
-    return json.requester_ip
+    const ip = json.requester_ip
+    set((state) => ({ ip: ip }));
+    return ip
   },
   clear: () => {
     set((state) => ({ results: [] }));
