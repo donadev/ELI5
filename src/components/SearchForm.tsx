@@ -30,7 +30,9 @@ export default function SearchForm() {
   const handleSearchQuery = async () => {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
-      mixpanel.track("search", {query: query})
+      setTimeout(() => {
+        mixpanel.track("search", {query: query})
+      }, 500)
       await inc()
       setLoading(true);
       await searchQuery({query: query});
