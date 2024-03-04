@@ -16,6 +16,7 @@ type SearchQuery = {
 
 type QueryStore = {
   results: SearchResult[];
+  visits: number,
   ip: string;
   get_ip: () => Promise<string>;
   search: (query: SearchQuery) => void;
@@ -37,6 +38,7 @@ export const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 export const useStore = create<QueryStore>((set) => ({
   results: [],
+  visits: 0,
   ip: "",
   get_ip: async () => {
     const response = await fetch("/api/ip");
@@ -98,8 +100,12 @@ export const useStore = create<QueryStore>((set) => ({
       .then(console.log)
   },
   incrementVisits: async () : Promise<number> => {
-    return await fetch('/api/visits', {
+    const response = await fetch('/api/visits', {
       method: "POST"
-    }).then(async r => (await r.json()).visits as number)
+    })
+    const json = await response.json()
+    const visits = json.visits as number
+    set((state) => ({ visits: visits }));
+    return visits
   }
 }));

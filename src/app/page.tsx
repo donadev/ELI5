@@ -10,19 +10,17 @@ import mixpanel from 'mixpanel-browser';
 
 const Home: React.FC = () => {
   const results = useStore((state) => state.results);
+  const visits = useStore((state) => state.visits);
   const getIp = useStore((state) => state.get_ip);
   const inc = useStore((state) => state.incrementVisits);
-  const [visits, setVisits] = useState(0)
 
   useEffect(() => {
-    mixpanel.init('4aa70294625b8c4f16a456d1bafa5ee9', {ignore_dnt: true, debug: process.env.DEBUG == "1", track_pageview: true, persistence: 'localStorage'});
+    mixpanel.init('4aa70294625b8c4f16a456d1bafa5ee9', {debug: process.env.DEBUG == "1", track_pageview: true, persistence: 'localStorage'});
     getIp()
     .then(async ip => {
-      const visits = await inc()
+      await inc()
       mixpanel.identify(ip)
-      return visits
     })
-    .then(setVisits)
     .catch(console.error)
   }, [])
   return (
