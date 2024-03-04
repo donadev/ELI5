@@ -7,7 +7,6 @@ export const metadata = {
   description: "Choose an argument and learn it with very simple principles",
 };
 
-mixpanel.init('4aa70294625b8c4f16a456d1bafa5ee9', {debug: process.env.DEBUG == "1", track_pageview: true, persistence: 'localStorage'});
 
 
 export default function RootLayout({

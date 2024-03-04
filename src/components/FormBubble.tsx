@@ -18,8 +18,9 @@ const FormBubble: React.FC<FormBubbleProps> = () => {
         toggleModal(true)
     }
     useEffect(() => {
-      console.log("bubbleAppeared")
-      mixpanel.track("bubbleAppeared")
+      setTimeout(() => {
+        mixpanel.track("bubbleAppeared")
+      }, 1000)
     }, []);
 
   return (
