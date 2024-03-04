@@ -15,7 +15,6 @@ const Home: React.FC = () => {
   const inc = useStore((state) => state.incrementVisits);
 
   useEffect(() => {
-    mixpanel.init('4aa70294625b8c4f16a456d1bafa5ee9', {debug: process.env.DEBUG == "1", track_pageview: true, persistence: 'localStorage'});
     getIp()
     .then(async ip => {
       await inc()
