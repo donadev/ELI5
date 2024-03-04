@@ -22,7 +22,8 @@ type QueryStore = {
   clear: () => void;
   toggleModal: (open: boolean) => void
   modalOpen: boolean,
-  openForm: () => void
+  convertUser: (email: string) => void
+  incrementVisits: () => Promise<number>
 };
 
 export const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -86,7 +87,19 @@ export const useStore = create<QueryStore>((set) => ({
     set((state) => ({ modalOpen: open}));
   },
   modalOpen: false,
-  openForm: () => {
-    window.open('https://forms.gle/c4AFWkYFkAQ7mZeLA', '_blank');
+  convertUser: (email : string) => {
+    fetch('/api/addEmail', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({email: email}),
+    })
+      .then(console.log)
+  },
+  incrementVisits: async () : Promise<number> => {
+    return await fetch('/api/visits', {
+      method: "POST"
+    }).then(async r => (await r.json()).visits as number)
   }
 }));

@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { Dots } from "react-activity";
 import "react-activity/dist/library.css";
 import { useSearchParams } from 'next/navigation'
-import { kv } from "@vercel/kv";
 import mixpanel from 'mixpanel-browser';
 
 export default function SearchForm() {
   const searchParams = useSearchParams()
-  const queryParam = searchParams.get('q')
+  const queryParam = searchParams?.get('q')
 
   const searchQuery = useStore((state) => state.search);
+  const inc = useStore((state) => state.incrementVisits);
   const ip = useStore((state) => state.ip);
   const clear = useStore((state) => state.clear);
   const [loading, setLoading] = useState(false);
@@ -31,10 +31,7 @@ export default function SearchForm() {
     if (query.length === 0) return alert("Query input must not be empty");
     try {
       mixpanel.track("search", {query: query})
-      const hits = (await kv.get<number>(query)) ?? 0
-      await kv.set<number>(query, hits + 1)
-      const visits = (await kv.get<number>(ip)) ?? 0
-      await kv.set<number>(ip, visits + 1)
+      await inc()
       setLoading(true);
       await searchQuery({query: query});
       setQuery("");

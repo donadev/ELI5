@@ -1,8 +1,11 @@
 import { useStore } from "@/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormModal from "./FormModal";
 import mixpanel from 'mixpanel-browser';
 
+
+
+// A one-shot query
 interface FormBubbleProps {
 }
 
@@ -14,11 +17,15 @@ const FormBubble: React.FC<FormBubbleProps> = () => {
         mixpanel.track("openModal")
         toggleModal(true)
     }
+    useEffect(() => {
+      console.log("bubbleAppeared")
+      mixpanel.track("bubbleAppeared")
+    }, []);
 
   return (
     <div className="rounded-lg  mb-4">
         {modalOpen ? <FormModal/> : null}
-        <p className="text-black">Discover the PRO version, it's free!</p>
+        <p className="text-black">Discover the PRO version, it's free for the first users!</p>
         <button onClick={openModal} className="text-sky-400 underline"> Click here</button>
     </div>
   );

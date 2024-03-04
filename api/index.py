@@ -8,6 +8,7 @@ import time
 import requests
 
 from api.ai import ask, askArgument
+from api.db import add_email, add_visit, get_visits
 from api.pubsub import stream
 
 app = Flask(__name__)
@@ -121,6 +122,17 @@ def get_requester_ip():
     requester_ip = request.remote_addr
     return jsonify({"requester_ip": requester_ip})
 
+@app.route("/api/visits", methods=["POST"])
+def incrementVisits():
+    add_visit(request.remote_addr)
+    visits = get_visits(request.remote_addr)
+    return {"visits": visits}
+
+@app.route("/api/addEmail", methods=["POST"])
+def addEmail():
+    email = request.json["email"]
+    add_email(email)
+    return {"status": "ok"}
 
 @app.route("/api/healthchecker", methods=["GET"])
 def healthchecker():
