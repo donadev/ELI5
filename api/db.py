@@ -17,9 +17,10 @@ def add_visit(ip : str):
     # Query di inserimento
     if visits == 0:
         query = "INSERT INTO visits (ip, visits) VALUES (%s, %s)"
+        values = (ip, visits + 1)
     else:
         query = "UPDATE visits SET visits = %s WHERE ip = %s"
-    values = (visits + 1, ip)
+        values = (visits + 1, ip)
     print(values, flush=True)
 
     cur.execute(query, values)
