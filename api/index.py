@@ -1,15 +1,14 @@
 import json
-import re
 from flask import Response, stream_with_context, Flask, render_template, request, jsonify
 from flask_cors import CORS
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
-import time
 import requests
 
 from api.ai import ask, askArgument
 from api.db import add_email, add_feedback, add_visit, get_visits
 from api.pubsub import stream
+from api.twitter import processTweet
 
 app = Flask(__name__)
 CORS(app)
@@ -141,6 +140,13 @@ def addFeedback():
     content = request.json["body"]
     add_feedback(query, content, feedback)
     return {"status": "ok"}
+
+
+@app.route("/api/twitter_request/process", methods=["POST"])
+def processRequest():
+    content = request.json["content"]
+    output = processTweet(content)
+    return {"status": "success", "message": output}
 
 @app.route("/api/healthchecker", methods=["GET"])
 def healthchecker():

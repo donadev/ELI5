@@ -19,6 +19,14 @@ def ask(prompt):
             {"role": "user", "content": prompt}
         ]).choices[0].message.content
 
+def askSummary(prompt):
+    print(prompt, flush=True)
+    return client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": f"I give you a tweet messags and you extract the noun of the argument that is asked to explain. Remove articles, adverbs and verbs from the output, if present."},
+            {"role": "user", "content": prompt}
+        ]).choices[0].message.content
 def askArgument(prompt):
     print(prompt, flush=True)
     return client.chat.completions.create(
