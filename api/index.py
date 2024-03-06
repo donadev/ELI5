@@ -8,7 +8,7 @@ import time
 import requests
 
 from api.ai import ask, askArgument
-from api.db import add_email, add_visit, get_visits
+from api.db import add_email, add_feedback, add_visit, get_visits
 from api.pubsub import stream
 
 app = Flask(__name__)
@@ -132,6 +132,14 @@ def incrementVisits():
 def addEmail():
     email = request.json["email"]
     add_email(email)
+    return {"status": "ok"}
+
+@app.route("/api/feedback", methods=["POST"])
+def addFeedback():
+    feedback = request.json["feedback"]
+    query = request.json["query"]
+    content = request.json["body"]
+    add_feedback(query, content, feedback)
     return {"status": "ok"}
 
 @app.route("/api/healthchecker", methods=["GET"])

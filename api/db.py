@@ -40,6 +40,21 @@ def get_visits(ip : str):
         return 0
     return int(result[0])
 
+def add_feedback(question: str, body: str, feedback: bool):
+
+    # Query di inserimento
+    try:
+        cur = conn.cursor()
+        query = "INSERT INTO feedback (query, body, feedback) VALUES (%s, %s, %s)"
+        values = (question, body, feedback)
+
+        cur.execute(query, values)
+        conn.commit()
+    except Exception as e:
+        print("error on setting feedback", e, flush=True)
+    finally:
+        cur.close()
+
 def add_email(mail : str):
 
     # Query di inserimento
@@ -50,7 +65,7 @@ def add_email(mail : str):
 
         cur.execute(query, values)
         conn.commit()
-    except:
-        print("error on adding email", flush=True)
+    except Exception as e:
+        print("error on adding email", e, flush=True)
     finally:
         cur.close()

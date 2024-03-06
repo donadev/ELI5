@@ -3,7 +3,7 @@ import Pusher from 'pusher-js';
 
 import { v4 as uuidv4 } from 'uuid';
 
-type SearchResult = {
+export type SearchResult = {
   query: string;
   id: string;
   message: string;
@@ -25,6 +25,7 @@ type QueryStore = {
   modalOpen: boolean,
   convertUser: (email: string) => void
   incrementVisits: () => Promise<number>
+  setFeedback: (result: SearchResult, useful: boolean) => Promise<void>
 };
 
 export const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -107,5 +108,15 @@ export const useStore = create<QueryStore>((set) => ({
     const visits = json.visits as number
     set((state) => ({ visits: visits }));
     return visits
-  }
+  },
+  setFeedback: async (result, useful) : Promise<void> => {
+    fetch('/api/feedback', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({feedback: useful, query: result.query, body: result.message}),
+    })
+      .then(console.log)
+  },
 }));
