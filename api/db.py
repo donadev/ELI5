@@ -7,13 +7,13 @@ user = os.environ.get("POSTGRES_USER")
 password = os.environ.get("POSTGRES_PASSWORD")
 host = os.environ.get("POSTGRES_HOST")
 
-conn = None
 def connect():
     # Connessione al database
-    conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=5432)
+    return psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=5432)
 
 
 def add_visit(ip : str):
+    conn = connect()
     visits = get_visits(ip)
     cur = conn.cursor()
 
@@ -31,7 +31,7 @@ def add_visit(ip : str):
     cur.close()
 
 def get_visits(ip : str):
-    connect()
+    conn = connect()
     cur = conn.cursor()
 
     query = "SELECT visits FROM visits WHERE ip = %s"
@@ -45,7 +45,7 @@ def get_visits(ip : str):
     return int(result[0])
 
 def add_feedback(question: str, body: str, feedback: bool):
-    connect()
+    conn = connect()
     # Query di inserimento
     try:
         cur = conn.cursor()
@@ -60,7 +60,7 @@ def add_feedback(question: str, body: str, feedback: bool):
         cur.close()
 
 def add_email(mail : str):
-    connect()
+    conn = connect()
     # Query di inserimento
     try:
         cur = conn.cursor()
