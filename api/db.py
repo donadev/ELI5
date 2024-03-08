@@ -14,7 +14,6 @@ def connect():
 
 
 def add_visit(ip : str):
-    connect()
     visits = get_visits(ip)
     cur = conn.cursor()
 
